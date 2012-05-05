@@ -1,5 +1,5 @@
 import sys, pygame
-from Khet_Classes import Game_Piece, Pharaoh, Djed, Obelisk, Pyramid
+from Khet_Classes import *
 
 # Read the game piece setup from a text file
 # The three starting configuration in the game will be provided but
@@ -29,20 +29,26 @@ def create_pieces(init_layout):
                 elif type == "Djed":
                     temp_piece_list.append(Djed([x, y], 
                                                 pygame.image.load("art/r_Djed.png"),
-                                                split[4],
+                                                int(split[4]),
                                                 "red"))
                 elif type == "Obelisk":
-                    if split[4] == 'True':
-                        temp_piece_list.append(Pharaoh([x, y], 
+                    if split[4].strip() == 'True':
+                        temp_piece_list.append(Obelisk([x, y], 
+                                                       pygame.image.load("art/r_Obelisk.png"),
+                                                       pygame.image.load("art/r_Stacked_Obelisk.png"),  
+                                                       "red",
+                                                       True))
+                        temp_piece_list.append(Obelisk([x, y], 
                                                        pygame.image.load("art/r_Obelisk.png"), 
-                                                       "red"))
-                        temp_piece_list.append(Pharaoh([x, y], 
-                                                       pygame.image.load("art/r_Obelisk.png"), 
-                                                       "red"))
+                                                       pygame.image.load("art/r_Stacked_Obelisk.png"), 
+                                                       "red",
+                                                       True))
                     else:
-                        temp_piece_list.append(Pharaoh([x, y], 
+                        temp_piece_list.append(Obelisk([x, y], 
                                                        pygame.image.load("art/r_Obelisk.png"), 
-                                                       "red"))
+                                                       pygame.image.load("art/r_Stacked_Obelisk.png"), 
+                                                       "red",
+                                                       False))
             elif color == 'gray':
                 if type == "Pharaoh":
                     temp_piece_list.append(Pharaoh([x, y], 
@@ -56,20 +62,26 @@ def create_pieces(init_layout):
                 elif type == "Djed":
                     temp_piece_list.append(Djed([x, y], 
                                                 pygame.image.load("art/g_Djed.png"),
-                                                split[4],
+                                                int(split[4]),
                                                 "gray"))
                 elif type == "Obelisk":
-                    if split[4] == 'True':
-                        temp_piece_list.append(Pharaoh([x, y], 
+                    if split[4].strip() == 'True':
+                        temp_piece_list.append(Obelisk([x, y], 
                                                        pygame.image.load("art/g_Obelisk.png"), 
-                                                       "gray"))
-                        temp_piece_list.append(Pharaoh([x, y], 
+                                                       pygame.image.load("art/g_Stacked_Obelisk.png"), 
+                                                       "gray",
+                                                       True))
+                        temp_piece_list.append(Obelisk([x, y], 
                                                        pygame.image.load("art/g_Obelisk.png"), 
-                                                       "gray"))
+                                                       pygame.image.load("art/g_Stacked_Obelisk.png"), 
+                                                       "gray",
+                                                       True))
                     else:
-                        temp_piece_list.append(Pharaoh([x, y], 
+                        temp_piece_list.append(Obelisk([x, y], 
                                                        pygame.image.load("art/g_Obelisk.png"), 
-                                                       "gray"))
+                                                       pygame.image.load("art/g_Stacked_Obelisk.png"), 
+                                                       "gray",
+                                                       False))
     return temp_piece_list
     
 # Initialize the PyGame
@@ -86,9 +98,13 @@ gameboard = pygame.image.load("art/game_board.png")
 black = (0, 0, 0)
 
 # Game Variables
-player_turn = 1
+player_turn = 0 #0 = pregame, 1 = P1 turn, 2 = P2 turn
 initial_game_layout = 1 #3 available options
 game_pieces = create_pieces(initial_game_layout)
+P1 = Player("P1", [[0,0],"Down"])
+P2 = Player("P2", [[9,7],"Up"])
+p1_win = False
+p2_win = False
 
 # -------- Main Program Loop -----------
 done = False
@@ -96,6 +112,46 @@ while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
+		
+        # Players Turns/Menu Stuff
+        if player_turn == 0:
+            # This is where any menu screen stuff would go
+            # Right now it just jumps straight into P1 turn
+            player_turn = 1
+        elif player_turn == 1:
+            # This is where the code for getting the players move will go
+            #
+            #
+            #
+            #
+            if P1.find_path(game_pieces) == "Game_Over_Win":
+				#P1 wins
+                pass
+            elif P1.find_path(game_pieces) == "Game_Over_Lose":
+				#P1 loses
+                pass
+            else:
+                player_turn = 2
+        elif player_turn == 2:
+            # This is where the code for getting the players move will go
+            #
+            #
+            #
+            #
+            if P2.find_path(game_pieces) == "Game_Over_Win":
+				#P2 wins
+                pass
+            elif P2.find_path(game_pieces) == "Game_Over_Lose":
+				#P2 loses
+                pass
+            else:
+                player_turn = 1
+        
+        # After one of the players win run this code
+        if p1_win:
+            pass
+        elif p2_win:
+            pass
         
     
     # Draw everything
