@@ -1,89 +1,6 @@
 import sys, pygame
 from Khet_Classes import *
 
-# Read the game piece setup from a text file
-# The three starting configuration in the game will be provided but
-# it is very simple to create your own layout.
-def create_pieces(init_layout):
-    with open("initial_layouts/piece_config_"+str(init_layout)+".txt") as f:
-        temp_piece_list = []
-        lines = f.readlines()
-        for line in lines:
-            if line.startswith("#") or line.strip() == "":
-                continue
-            split = line.split(", ")
-            color = split[0]
-            type = split[1]
-            x = split[2]
-            y = split[3]
-            if color == "red":
-                if type == "Pharaoh":
-                    temp_piece_list.append(Pharaoh([x, y], 
-                                                   pygame.image.load("art/r_Pharaoh.png"), 
-                                                   "red"))
-                elif type == "Pyramid":
-                    temp_piece_list.append(Pyramid([x, y], 
-                                                   pygame.image.load("art/r_Pyramid.png"), 
-                                                   int(split[4]),
-                                                   "red"))
-                elif type == "Djed":
-                    temp_piece_list.append(Djed([x, y], 
-                                                pygame.image.load("art/r_Djed.png"),
-                                                int(split[4]),
-                                                "red"))
-                elif type == "Obelisk":
-                    if split[4].strip() == 'True':
-                        temp_piece_list.append(Obelisk([x, y], 
-                                                       pygame.image.load("art/r_Obelisk.png"),
-                                                       pygame.image.load("art/r_Stacked_Obelisk.png"),  
-                                                       "red",
-                                                       True))
-                        temp_piece_list.append(Obelisk([x, y], 
-                                                       pygame.image.load("art/r_Obelisk.png"), 
-                                                       pygame.image.load("art/r_Stacked_Obelisk.png"), 
-                                                       "red",
-                                                       True))
-                    else:
-                        temp_piece_list.append(Obelisk([x, y], 
-                                                       pygame.image.load("art/r_Obelisk.png"), 
-                                                       pygame.image.load("art/r_Stacked_Obelisk.png"), 
-                                                       "red",
-                                                       False))
-            elif color == 'gray':
-                if type == "Pharaoh":
-                    temp_piece_list.append(Pharaoh([x, y], 
-                                                   pygame.image.load("art/g_Pharaoh.png"), 
-                                                   "gray"))
-                elif type == "Pyramid":
-                    temp_piece_list.append(Pyramid([x, y], 
-                                                   pygame.image.load("art/g_Pyramid.png"), 
-                                                   int(split[4]),
-                                                   "gray"))
-                elif type == "Djed":
-                    temp_piece_list.append(Djed([x, y], 
-                                                pygame.image.load("art/g_Djed.png"),
-                                                int(split[4]),
-                                                "gray"))
-                elif type == "Obelisk":
-                    if split[4].strip() == 'True':
-                        temp_piece_list.append(Obelisk([x, y], 
-                                                       pygame.image.load("art/g_Obelisk.png"), 
-                                                       pygame.image.load("art/g_Stacked_Obelisk.png"), 
-                                                       "gray",
-                                                       True))
-                        temp_piece_list.append(Obelisk([x, y], 
-                                                       pygame.image.load("art/g_Obelisk.png"), 
-                                                       pygame.image.load("art/g_Stacked_Obelisk.png"), 
-                                                       "gray",
-                                                       True))
-                    else:
-                        temp_piece_list.append(Obelisk([x, y], 
-                                                       pygame.image.load("art/g_Obelisk.png"), 
-                                                       pygame.image.load("art/g_Stacked_Obelisk.png"), 
-                                                       "gray",
-                                                       False))
-    return temp_piece_list
-    
 # Initialize the PyGame
 pygame.init()
 
@@ -91,8 +8,7 @@ pygame.init()
 size = width, height = 683, 477 #583,477
 screen = pygame.display.set_mode(size)
 
-# Load the Game Board image
-gameboard = pygame.image.load("art/game_board.png")
+
 
 # Define colors
 black = (0, 0, 0)
@@ -100,7 +16,7 @@ black = (0, 0, 0)
 # Game Variables
 player_turn = 0 #0 = pregame, 1 = P1 turn, 2 = P2 turn
 initial_game_layout = 1 #3 available options
-game_pieces = create_pieces(initial_game_layout)
+game_board = Game_Board(initial_game_layout)
 P1 = Player("P1", [[0,0],"Down"])
 P2 = Player("P2", [[9,7],"Up"])
 p1_win = False
@@ -109,6 +25,7 @@ p2_win = False
 # -------- Main Program Loop -----------
 done = False
 while not done:
+    global game_board
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
@@ -124,10 +41,10 @@ while not done:
             #
             #
             #
-            if P1.find_path(game_pieces) == "Game_Over_Win":
+            if P1.find_path(game_board._game_pieces) == "Game_Over_Win":
 				#P1 wins
                 pass
-            elif P1.find_path(game_pieces) == "Game_Over_Lose":
+            elif P1.find_path(game_board._game_pieces) == "Game_Over_Lose":
 				#P1 loses
                 pass
             else:
@@ -138,10 +55,10 @@ while not done:
             #
             #
             #
-            if P2.find_path(game_pieces) == "Game_Over_Win":
+            if P2.find_path(game_board._game_pieces) == "Game_Over_Win":
 				#P2 wins
                 pass
-            elif P2.find_path(game_pieces) == "Game_Over_Lose":
+            elif P2.find_path(game_board._game_pieces) == "Game_Over_Lose":
 				#P2 loses
                 pass
             else:
@@ -156,8 +73,8 @@ while not done:
     
     # Draw everything
     screen.fill(black)
-    screen.blit(gameboard, gameboard.get_rect())
-    for p in game_pieces:
+    game_board.draw(screen)
+    for p in game_board._game_pieces:
         p.draw(screen)
     pygame.display.flip()
 

@@ -190,7 +190,106 @@ class Obelisk(Game_Piece):
             self._cell_location[1] = y
         
         # Need to add code to be able to stack
-		
+
+class Game_Board(object):
+    # Load the Game Board image
+    _art = pygame.image.load("art/game_board.png")
+    _initial_layout = 1
+    _game_pieces = []
+    
+    def __init__(self, init_layout):
+        _initial_layout = init_layout
+        self.create_pieces()
+    
+    def draw(self, the_screen):
+        the_screen.blit(self._art, self._art.get_rect())
+    
+    # Read the game piece setup from a text file
+    # The three starting configuration in the game will be provided but
+    # it is very simple to create your own layout.
+    def create_pieces(self):
+        with open("initial_layouts/piece_config_"+str(self._initial_layout)+".txt") as f:
+            temp_piece_list = []
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith("#") or line.strip() == "":
+                    continue
+                split = line.split(", ")
+                color = split[0]
+                type = split[1]
+                x = split[2]
+                y = split[3]
+                if color == "red":
+                    if type == "Pharaoh":
+                        temp_piece_list.append(Pharaoh([x, y], 
+                                                       pygame.image.load("art/r_Pharaoh.png"), 
+                                                       "red"))
+                    elif type == "Pyramid":
+                        temp_piece_list.append(Pyramid([x, y], 
+                                                       pygame.image.load("art/r_Pyramid.png"), 
+                                                       int(split[4]),
+                                                       "red"))
+                    elif type == "Djed":
+                        temp_piece_list.append(Djed([x, y], 
+                                                    pygame.image.load("art/r_Djed.png"),
+                                                    int(split[4]),
+                                                    "red"))
+                    elif type == "Obelisk":
+                        if split[4].strip() == 'True':
+                            temp_piece_list.append(Obelisk([x, y], 
+                                                           pygame.image.load("art/r_Obelisk.png"),
+                                                           pygame.image.load("art/r_Stacked_Obelisk.png"),  
+                                                           "red",
+                                                           True))
+                            temp_piece_list.append(Obelisk([x, y], 
+                                                           pygame.image.load("art/r_Obelisk.png"), 
+                                                           pygame.image.load("art/r_Stacked_Obelisk.png"), 
+                                                           "red",
+                                                           True))
+                        else:
+                            temp_piece_list.append(Obelisk([x, y], 
+                                                           pygame.image.load("art/r_Obelisk.png"), 
+                                                           pygame.image.load("art/r_Stacked_Obelisk.png"), 
+                                                           "red",
+                                                           False))
+                elif color == 'gray':
+                    if type == "Pharaoh":
+                        temp_piece_list.append(Pharaoh([x, y], 
+                                                       pygame.image.load("art/g_Pharaoh.png"), 
+                                                       "gray"))
+                    elif type == "Pyramid":
+                        temp_piece_list.append(Pyramid([x, y], 
+                                                       pygame.image.load("art/g_Pyramid.png"), 
+                                                       int(split[4]),
+                                                       "gray"))
+                    elif type == "Djed":
+                        temp_piece_list.append(Djed([x, y], 
+                                                    pygame.image.load("art/g_Djed.png"),
+                                                    int(split[4]),
+                                                    "gray"))
+                    elif type == "Obelisk":
+                        if split[4].strip() == 'True':
+                            temp_piece_list.append(Obelisk([x, y], 
+                                                           pygame.image.load("art/g_Obelisk.png"), 
+                                                           pygame.image.load("art/g_Stacked_Obelisk.png"), 
+                                                           "gray",
+                                                           True))
+                            temp_piece_list.append(Obelisk([x, y], 
+                                                           pygame.image.load("art/g_Obelisk.png"), 
+                                                           pygame.image.load("art/g_Stacked_Obelisk.png"), 
+                                                           "gray",
+                                                           True))
+                        else:
+                            temp_piece_list.append(Obelisk([x, y], 
+                                                           pygame.image.load("art/g_Obelisk.png"), 
+                                                           pygame.image.load("art/g_Stacked_Obelisk.png"), 
+                                                           "gray",
+                                                           False))
+        self._game_pieces = temp_piece_list
+    
+class Laser_Path(object):
+    pass
+    
 class Player(object):
     name = ""
     laser_movement = [] #[[0,0],"Down"] where [0,0] is the next cell the laser will hit and "Down" is the direction it enters that cell
@@ -203,6 +302,9 @@ class Player(object):
 	# Return "Game_Over_Lose if killed your own Pharaoh (i.e. you're stupid.)
 	# Else, Return ""
     def find_path(self, pieces):
+        l_path = []
         for piece in pieces:
-            
+            pass
+        
+        return l_path
 		
