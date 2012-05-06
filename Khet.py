@@ -8,9 +8,10 @@ pygame.init()
 size = width, height = 683, 477 #583,477
 screen = pygame.display.set_mode(size)
 
-# Define colors
+# Define colors and font
 black = (0, 0, 0)
 white = (255, 255, 255)
+font = pygame.font.Font(None, 35)
 
 # Game Variables
 player_turn = 1 #0 = pregame, 1 = P1 turn, 2 = P2 turn
@@ -27,10 +28,11 @@ screen.fill(black)
 game_board.draw()
 while not done:
     # Getting the input form the user
-    drawing = False
     surrounding = []
     curr_piece = None
     selected = False
+    drawing = False
+    moved = False
     while not drawing:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -54,7 +56,7 @@ while not done:
                         if m_cell == cell:
                             game_board.reset_cells(prev_surrounding)
                             curr_piece.move(cell, game_board)
-                            drawing = True
+                            moved = True
                             continue
                             
                 if game_board.get_cell_status(m_cell) == 'piece':
@@ -76,30 +78,43 @@ while not done:
                 if event.key == 113:
                     curr_piece.rotate('L')
                     game_board.reset_cells(prev_surrounding)
-                    drawing = True
+                    moved = True
                 elif event.key == 119:
                     curr_piece.rotate('R')
                     game_board.reset_cells(prev_surrounding)
-                    drawing = True
+                    moved = True
+            
+            if moved and not drawing:
+                text1 = font.render("Press Enter to Fire Laser", True, white, black)
+                text2 = font.render("Player "+str(player_turn), True, white, black)
+                text1_size = [text1.get_width(), text1.get_height()]
+                text2_size = [text2.get_width(), text2.get_height()]
                 
-                
+                screen.blit(text1, [size[0]/2 - text1_size[0]/2, size[1]/2 - text1_size[1]/2])
+                screen.blit(text2, [size[0]/2 - text2_size[0]/2, size[1]/2 - text1_size[1]*1.5])
+                pygame.display.flip()
+            
+            if moved and event.type == pygame.KEYDOWN and event.key == 13:
+                drawing = True
                         
         # Used to clear highlighted cells on new click                
         prev_surrounding = surrounding
-    
     
     game_board.draw()
     
     # The drawing of the lasers
     if player_turn == 1:
+        
         l_path = P1.find_path(game_board)
         game_board.draw_laser(l_path)
+        pygame.time.wait(1200)
         player_turn = 2
     elif player_turn == 2:
         l_path = P2.find_path(game_board)
         game_board.draw_laser(l_path)
+        pygame.time.wait(1200)
         player_turn = 1
-        
+    
     game_board.draw()
     
     
