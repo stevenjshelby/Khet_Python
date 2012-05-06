@@ -1,10 +1,10 @@
 red, Pharaoh, 5, 0
-red, Pyramid, 0, 3, 3
+red, Pyramid, 0, 3, 4
 red, Pyramid, 0, 4, 1
-red, Pyramid, 2, 1, 4
+red, Pyramid, 2, 1, 2
 red, Pyramid, 7, 0, 1
 red, Pyramid, 7, 3, 1
-red, Pyramid, 7, 4, 3
+red, Pyramid, 7, 4, 4
 red, Pyramid, 6, 5, 1
 red, Djed, 4, 3, 2
 red, Djed, 5, 3, 1
@@ -12,13 +12,13 @@ red, Obelisk, 4, 0, True
 red, Obelisk, 6, 0, True
 
 gray, Pharaoh, 4, 7
-gray, Pyramid, 3, 2, 2
-gray, Pyramid, 2, 3, 4
-gray, Pyramid, 9, 3, 2
-gray, Pyramid, 2, 4, 2
-gray, Pyramid, 9, 4, 4
-gray, Pyramid, 7, 6, 3
-gray, Pyramid, 2, 7, 2
+gray, Pyramid, 3, 2, 3
+gray, Pyramid, 2, 3, 2
+gray, Pyramid, 9, 3, 3
+gray, Pyramid, 2, 4, 3
+gray, Pyramid, 9, 4, 2
+gray, Pyramid, 7, 6, 4
+gray, Pyramid, 0, 7, 4
 gray, Djed, 4, 4, 1
 gray, Djed, 5, 4, 2
 gray, Obelisk, 3, 7, True
