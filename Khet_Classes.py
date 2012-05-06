@@ -36,7 +36,7 @@ class Game_Piece(object):
         pass
         # Defined in the classes that ened it
         
-    def pass_laser(self):
+    def pass_laser(self, indir):
         pass
         # Defined in sub-classes
         
@@ -76,34 +76,34 @@ class Pyramid(Game_Piece):
         
     def pass_laser(self, in_dir):
         if self._direction == 1:
-            if in_dir == 'Right':
+            if in_dir == 'Left':
                 return 'Down'
-            elif in_dir == 'Down':
+            elif in_dir == 'Up':
                 return 'Right'
             else:
                 # This piece will die now
                 self._alive = False
                 return 'die'
         elif self._direction == 2:
-            if in_dir == 'Left':
+            if in_dir == 'Right':
                 return 'Up'
-            elif in_dir == 'Up':
+            elif in_dir == 'Down':
                 return 'Left'
             else:
                 # This piece will die now
                 self._alive = False
                 return 'die'
         elif self._direction == 3:
-            if in_dir == 'Up':
+            if in_dir == 'Down':
                 return 'Right'
-            elif in_dir == 'Right':
+            elif in_dir == 'Left':
                 return 'Up'
             else:
                 # This piece will die now
                 self._alive = False
                 return 'die'
         elif self._direction == 4:
-            if in_dir == 'Down':
+            if in_dir == 'Up':
                 return 'Right'
             elif in_dir == 'Right':
                 return 'Down'
@@ -204,6 +204,32 @@ class Game_Board(object):
     def draw(self, the_screen):
         the_screen.blit(self._art, self._art.get_rect())
     
+    def get_cell_status(self, cell_pos):
+        for piece in self._game_pieces:
+            if piece._cell_location == cell_pos:
+                return 'piece'
+            if cell_pos[0] < 0 or cell_pos[0] > 9:
+                return 'wall'
+            if cell_pos[1] < 0 or cell_pos[1] > 7:
+                return 'wall'
+                
+        return 'straight'
+        
+    def get_piece_by_cell(self, cell_pos):
+        for piece in self._game_pieces:
+            if piece._cell_location == cell_pos:
+                return piece
+        return False
+        
+    def draw_laser(self, l_path, the_screen):
+        # Define the line color...Change it with (R,G,B) values
+        red = (255, 0, 0)
+        for path_point in l_path:
+            #do stuff
+            pass
+        
+        
+    
     # Read the game piece setup from a text file
     # The three starting configuration in the game will be provided but
     # it is very simple to create your own layout.
@@ -217,8 +243,8 @@ class Game_Board(object):
                 split = line.split(", ")
                 color = split[0]
                 type = split[1]
-                x = split[2]
-                y = split[3]
+                x = int(split[2])
+                y = int(split[3])
                 if color == "red":
                     if type == "Pharaoh":
                         temp_piece_list.append(Pharaoh([x, y], 
@@ -287,9 +313,6 @@ class Game_Board(object):
                                                            False))
         self._game_pieces = temp_piece_list
     
-class Laser_Path(object):
-    pass
-    
 class Player(object):
     name = ""
     laser_movement = [] #[[0,0],"Down"] where [0,0] is the next cell the laser will hit and "Down" is the direction it enters that cell
@@ -301,10 +324,51 @@ class Player(object):
 	# Return "Game_Over_Win" if killed other players Pharaoh
 	# Return "Game_Over_Lose if killed your own Pharaoh (i.e. you're stupid.)
 	# Else, Return ""
-    def find_path(self, pieces):
+    def find_path(self, gameboard):
+        pieces = gameboard._game_pieces
         l_path = []
-        for piece in pieces:
-            pass
+        l_path.append(self.laser_movement)
+        
+        i = 0
+        next_cell = [l_path[i][0][0], l_path[i][0][1]]
+        while i >= 0:
+            curr_dir = l_path[i][1]
+            while not gameboard.get_cell_status(next_cell) == 'piece':
+                if gameboard.get_cell_status(next_cell) == 'wall':
+                    break
+                else:
+                    if curr_dir == 'Up':
+                        next_cell[1] -= 1
+                    elif curr_dir == 'Down':
+                        next_cell[1] += 1
+                    elif curr_dir == 'Left':
+                        next_cell[0] -= 1
+                    elif curr_dir == 'Right':
+                        next_cell[0] += 1
+           
+            if gameboard.get_cell_status(next_cell) == 'wall':
+                l_path.append([next_cell, 'Terminate'])
+                i = -1
+            else:
+                # Must be a piece at the cell if made it here
+                curr_piece = gameboard.get_piece_by_cell(next_cell)
+                
+                # The direction that this piece forwards the laser
+                forward_dir = curr_piece.pass_laser(curr_dir)
+                if forward_dir == 'die':
+                    l_path.append([next_cell, 'Terminate'])
+                    i = -1
+                else:
+                    l_path.append([next_cell, forward_dir])
+                    if forward_dir == 'Up':
+                        next_cell = [next_cell[0], next_cell[1] - 1]
+                    if forward_dir == 'Down':
+                        next_cell = [next_cell[0], next_cell[1] + 1]
+                    if forward_dir == 'Left':
+                        next_cell = [next_cell[0] - 1, next_cell[1]]
+                    if forward_dir == 'Right':
+                        next_cell = [next_cell[0] + 1, next_cell[1]]
+                    i += 1
         
         return l_path
 		
