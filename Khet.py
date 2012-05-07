@@ -1,11 +1,13 @@
 import sys, pygame
-from Khet_Classes import *
+from Player import *
+from GameBoard import *
+from Pieces import *
 
 # Initialize the PyGame
 pygame.init()
 
 # Set the height and width of the screen
-size = width, height = 683, 477 #583,477
+size = width, height = 583, 477 #583,477
 screen = pygame.display.set_mode(size)
 
 # Define colors and font
@@ -25,7 +27,7 @@ p2_win = False
 # -------- Main Program Loop -----------
 done = False
 screen.fill(black)
-game_board.draw()
+game_board.draw(player_turn, font)
 while not done:
     # Getting the input form the user
     surrounding = []
@@ -46,8 +48,9 @@ while not done:
                 # This is where any menu screen stuff would go
                 # Right now it just jumps straight into P1 turn
                pass
-               
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            
+            # Check mouse clicks
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not moved:
                 m_pos = pygame.mouse.get_pos()
                 m_cell = game_board.coords_to_cell(m_pos)
                         
@@ -57,9 +60,10 @@ while not done:
                             game_board.reset_cells(prev_surrounding)
                             curr_piece.move(cell, game_board)
                             moved = True
+                            game_board.draw(player_turn, font)
                             continue
                             
-                if game_board.get_cell_status(m_cell) == 'piece':
+                if game_board.get_cell_status(m_cell) == 'piece' and not selected:
                     if player_turn == 1 :
                         if game_board.get_piece_by_cell(m_cell)._color == 'red':
                             curr_piece = game_board.get_piece_by_cell(m_cell)
@@ -74,16 +78,23 @@ while not done:
                             game_board.reset_cells(prev_surrounding)
                             game_board.draw_highlight(surrounding, m_cell)
                             selected = True
-            elif event.type == pygame.KEYDOWN and selected and (curr_piece.id == 'pyramid' or curr_piece.id == 'djed'):
+            elif event.type == pygame.KEYDOWN and selected and not moved and (curr_piece.id == 'pyramid' or curr_piece.id == 'djed'):
                 if event.key == 113:
                     curr_piece.rotate('L')
-                    game_board.reset_cells(prev_surrounding)
                     moved = True
+                    game_board.draw(player_turn, font)
                 elif event.key == 119:
                     curr_piece.rotate('R')
-                    game_board.reset_cells(prev_surrounding)
                     moved = True
+                    game_board.draw(player_turn, font)
+                    
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+                game_board.reset_cells(prev_surrounding)
+                selected = False
+                drawing = False
+                moved = False
             
+            # Player has moved and has not pressed Enter to fire laser
             if moved and not drawing:
                 text1 = font.render("Press Enter to Fire Laser", True, white, black)
                 text2 = font.render("Player "+str(player_turn), True, white, black)
@@ -93,18 +104,20 @@ while not done:
                 screen.blit(text1, [size[0]/2 - text1_size[0]/2, size[1]/2 - text1_size[1]/2])
                 screen.blit(text2, [size[0]/2 - text2_size[0]/2, size[1]/2 - text1_size[1]*1.5])
                 pygame.display.flip()
-            
+                
+            # If Enter or Backspace is pressed
             if moved and event.type == pygame.KEYDOWN and event.key == 13:
                 drawing = True
+            elif moved and event.type == pygame.KEYDOWN and event.key == 8:
+                moved = False
                         
         # Used to clear highlighted cells on new click                
         prev_surrounding = surrounding
     
-    game_board.draw()
+    game_board.draw(player_turn, font)
     
     # The drawing of the lasers
     if player_turn == 1:
-        
         l_path = P1.find_path(game_board)
         game_board.draw_laser(l_path)
         pygame.time.wait(1200)
@@ -115,8 +128,7 @@ while not done:
         pygame.time.wait(1200)
         player_turn = 1
     
-    game_board.draw()
-    
+    game_board.draw(player_turn, font)
     
 
 pygame.quit()
