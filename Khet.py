@@ -21,8 +21,6 @@ initial_game_layout = 1 #3 available options
 game_board = Game_Board(initial_game_layout, screen)
 P1 = Player("P1", [[0,0],"Down"])
 P2 = Player("P2", [[9,7],"Up"])
-p1_win = False
-p2_win = False
 
 # -------- Main Program Loop -----------
 done = False
@@ -114,6 +112,9 @@ while not done:
         # Used to clear highlighted cells on new click                
         prev_surrounding = surrounding
     
+    if player_turn == -1:
+        break
+        
     game_board.draw(player_turn, font)
     
     # The drawing of the lasers
@@ -128,7 +129,21 @@ while not done:
         pygame.time.wait(1200)
         player_turn = 1
     
+    if P1.p1_win or P2.p2_win:
+        break
+        
     game_board.draw(player_turn, font)
-    
+
+#Check for winner
+if P1.p1_win == True:
+    win_text = font.render("Player 1 Wins!", True, white, black)
+elif P2.p2_win == True:
+    win_text = font.render("Player 2 Wins!", True, white, black)
+
+win_text_size = [win_text.get_width(), win_text.get_height()]
+screen.blit(win_text, [size[0]/2 - win_text_size[0]/2, size[1]/2 - win_text_size[1]/2])
+pygame.display.flip()
+     
+pygame.time.wait(3000)
 
 pygame.quit()

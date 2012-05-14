@@ -3,7 +3,9 @@ import sys, pygame
 class Player(object):
     name = ""
     laser_movement = [] #[[0,0],"Down"] where [0,0] is the next cell the laser will hit and "Down" is the direction it enters that cell
-	
+    p1_win = False
+    p2_win = False
+    
     # Constructor
     def __init__(self, name, laser_movement):
         self.name = name
@@ -44,9 +46,9 @@ class Player(object):
                 if forward_dir == 'die':
                     if curr_piece.id == 'pharaoh':
                         if curr_piece._color == 'red':
-                            p1_win = True
+                            self.p2_win = True
                         elif curr_piece._color == 'gray':
-                            p2_win = True
+                            self.p1_win = True
                         pieces.remove(curr_piece)
                     else:
                         pieces.remove(curr_piece)
